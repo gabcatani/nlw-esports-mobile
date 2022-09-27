@@ -1,20 +1,22 @@
+import { useEffect, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { View, TouchableOpacity, Text, Image, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Background } from '../../components/Background';
 import { Entypo } from '@expo/vector-icons'
 
+import { Background } from '../../components/Background';
 import logoImg from '../../assets/logo-nlw-esports.png'
 import { styles } from './styles';
 import { GameParams } from '../../@types/@navigation'
 import { THEME } from '../../theme';
 import { Header } from '../../components/Header';
 import { DuoCard, DuoCardProps } from '../../components/DuoCard';
-import { useEffect, useState } from 'react';
+import { DuoMatch } from '../../components/DuoMatch';
 
 export function Game() {
 
     const [duos, setDuos] = useState<DuoCardProps[]>([])
+    const [duoSelected, setDuoSelected] = useState<string>('')
 
     const navigation = useNavigation()
     const route = useRoute()
@@ -22,6 +24,14 @@ export function Game() {
   
     function handleGoBack() {
       navigation.goBack()
+    }
+
+    async function getDiscordUser(adsId: string) {
+      useEffect(() => {
+        fetch(`http://192.168.0.106:3000/games/${adsId}/discord`)
+        .then(response => response.json())
+        .then(data => setDuoSelected(data.discord))
+      }, [])
     }
 
     useEffect(() => {
@@ -79,6 +89,11 @@ export function Game() {
           )}
         />
         
+        <DuoMatch 
+          visible={duoSelected.length > 0}
+          discord={duoSelected}
+          onClose={() => setDuoSelected('')}
+        />
       </SafeAreaView>
     </Background>
   );
